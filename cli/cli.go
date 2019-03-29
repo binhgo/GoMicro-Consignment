@@ -4,7 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	pb "github.com/GoMicro-Consignment/GoMicro-Consignment/proto/consignment"
-	"google.golang.org/grpc"
+	microclient "github.com/micro/go-micro/client"
+	"github.com/micro/go-micro/cmd"
 	"io/ioutil"
 	"log"
 	"os"
@@ -26,14 +27,16 @@ func parseFile(file string) (*pb.Consignment, error) {
 }
 
 func main() {
+	cmd.Init()
 
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("Did not connect: %v", err)
-	}
-	defer conn.Close()
+	client := pb.NewShippingServiceClient("go.micro.srv.consignment", microclient.DefaultClient)
 
-	client := pb.NewShippingServiceClient(conn)
+	//conn, err := grpc.Dial(address, grpc.WithInsecure())
+	//if err != nil {
+	//	log.Fatalf("Did not connect: %v", err)
+	//}
+	//defer conn.Close()
+	//client := pb.NewShippingServiceClient(conn)
 
 
 	// Contact the server and print out its response.

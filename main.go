@@ -1,13 +1,11 @@
 package main
 
 import (
+	"fmt"
 	pb "github.com/GoMicro-Consignment/GoMicro-Consignment/proto/consignment"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
-	"log"
-	"net"
+	"golang.org/x/net/context"
+	micro "github.com/micro/go-micro"
 )
-import "golang.org/x/net/context"
 
 const port = ":50051"
 
@@ -15,18 +13,19 @@ func main() {
 
 	repo := &Repository{}
 
-	listener, err := net.Listen("tcp", port)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
+	service := micro.NewService(
+		// This name must match the package name given in your protobuf definition
+		micro.Name("go.micro.srv.consignment"),
+		micro.Version("latest"),
+	)
 
-	server := grpc.NewServer()
+	service.Init()
 
-	pb.RegisterShippingServiceServer(server, &Service{repo:repo})
-	reflection.Register(server)
+	pb.RegisterShippingServiceHandler(service.Server(), &Service{repo:repo})
 
-	if err := server.Serve(listener); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+	// Run the server
+	if err := service.Run(); err != nil {
+		fmt.Println(err)
 	}
 }
 
@@ -55,16 +54,36 @@ type Service struct {
 	repo IRepository
 }
 
-func (s *Service) CreateConsignment(ctx context.Context, req *pb.Consignment) (*pb.Response, error) {
-
+func (s *Service) CreateConsignment(ctx context.Context, req *pb.Consignment, res *pb.Response) error {
+	// Save our consignment
 	consignment, err := s.repo.Create(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &pb.Response{Created: true, Consignment: consignment}, nil
+	// Return matching the `Response` message we created in our
+	// protobuf definition.
+	res.Created = true
+	res.Consignment = consignment
+	return nil
 }
 
-func (s *Service) GetConsignment(ctx context.Context, req *pb.GetRequest) (*pb.Response, error) {
-	return &pb.Response{Created:true, Consignments:s.repo.GetAll()}, nil
+//func (s *Service) CreateConsignment(ctx context.Context, req *pb.Consignment) (*pb.Response, error) {
+//
+//	consignment, err := s.repo.Create(req)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return &pb.Response{Created: true, Consignment: consignment}, nil
+//}
+
+func (s *Service) GetConsignment(ctx context.Context, req *pb.GetRequest, res *pb.Response) error {
+	consignments := s.repo.GetAll()
+	res.Consignments = consignments
+	return nil
 }
+
+//func (s *Service) GetConsignment(ctx context.Context, req *pb.GetRequest) (*pb.Response, error) {
+//	return &pb.Response{Created:true, Consignments:s.repo.GetAll()}, nil
+//}
