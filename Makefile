@@ -1,10 +1,8 @@
 build:
 	protoc -I. --go_out=plugins=micro:$(GOPATH)/src/github.com/GoMicro-Consignment/GoMicro-Consignment \
 	proto/consignment/consignment.proto
-	go get golang.org/x/sys/unix
-	GOOS=linux GOARCH=amd64 go build
 	docker login --username huynhbinh -p Cicevn2007
-	docker build -t consignment-service .
+	docker build --build-arg https://binhgo:32771fab1118c28299299f9f765fb3db0d0a691f@github.com -t consignment-service .
 
 run:
 	docker run -p 50051:50051 \

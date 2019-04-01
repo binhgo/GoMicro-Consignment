@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	pb "github.com/GoMicro-Consignment/GoMicro-Consignment/proto/consignment"
-	"golang.org/x/net/context"
 	micro "github.com/micro/go-micro"
+	"golang.org/x/net/context"
+	vesselPB "github.com/GoMicro-Consignment/GoMicro-Vessel/proto/vessel"
+	"log"
 )
 
 const port = ":50051"
@@ -19,9 +21,11 @@ func main() {
 		micro.Version("latest"),
 	)
 
+	vesselClient := vesselPB.NewVesselServiceClient("go.micro.srv.vessel", service.Client())
+
 	service.Init()
 
-	pb.RegisterShippingServiceHandler(service.Server(), &Service{repo:repo})
+	pb.RegisterShippingServiceHandler(service.Server(), &Service{repo:repo, vesselClient:vesselClient})
 
 	// Run the server
 	if err := service.Run(); err != nil {
@@ -52,9 +56,25 @@ func (repo *Repository) GetAll()  []*pb.Consignment {
 
 type Service struct {
 	repo IRepository
+	vesselClient vesselPB.VesselServiceClient
 }
 
 func (s *Service) CreateConsignment(ctx context.Context, req *pb.Consignment, res *pb.Response) error {
+
+	vesselResponse, err := s.vesselClient.FindAvailable(context.Background(), &vesselPB.Specification{
+		MaxWeight: req.Weight,
+		Capacity:  int32(len(req.Containers)),
+	})
+
+	log.Printf("Found vessel: %s \n", vesselResponse.Vessel.Name)
+	if err != nil {
+		return err
+	}
+
+	// We set the VesselId as the vessel we got back from our
+	// vessel service
+	req.VesselId = vesselResponse.Vessel.Id
+
 	// Save our consignment
 	consignment, err := s.repo.Create(req)
 	if err != nil {
