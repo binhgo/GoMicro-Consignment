@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
-	pb "github.com/GoMicro-Consignment/GoMicro-Consignment/proto/consignment"
+	pb "github.com/binhgo/GoMicro-Consignment/proto/consignment"
 	microclient "github.com/micro/go-micro/client"
 	"github.com/micro/go-micro/cmd"
 	"io/ioutil"

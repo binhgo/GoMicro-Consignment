@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	pb "github.com/GoMicro-Consignment/GoMicro-Consignment/proto/consignment"
+	pb "github.com/binhgo/GoMicro-Consignment/proto/consignment"
+	vesselPB "github.com/binhgo/GoMicro-Vessel/proto/vessel"
 	micro "github.com/micro/go-micro"
 	"golang.org/x/net/context"
-	vesselPB "github.com/GoMicro-Consignment/GoMicro-Vessel/proto/vessel"
 	"log"
 )
 
