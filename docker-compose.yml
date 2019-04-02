@@ -1,0 +1,16 @@
+# docker-compose.yml
+version: '3.1'
+
+services:
+
+  consignment-cli:
+    build: ./cli
+    environment:
+      MICRO_REGISTRY: "mdns"
+
+  consignment-service:
+    build: .
+    ports:
+      - 50051:50051
+    environment:
+      - SSH_PRIVATE_KEY=${SSH_PRIVATE_KEY}
