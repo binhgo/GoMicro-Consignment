@@ -6,13 +6,13 @@
 FROM golang:latest as builder
 # ARG security: https://bit.ly/2oY3pCn
 ARG SSH_PRIVATE_KEY
-WORKDIR /builder/
-ADD . /builder/
-RUN mkdir -p ~/.ssh && umask 0077 && echo "${SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa \
-	&& git config --global url."git@bitbucket.org:".insteadOf https://bitbucket.org/ \
-	&& git config --global url."git@github.com:".insteadOf https://github.com/ \
-	&& ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts \
-	&& ssh-keyscan github.com >> ~/.ssh/known_hosts
+#WORKDIR /builder/
+#ADD . /builder/
+#RUN mkdir -p ~/.ssh && umask 0077 && echo "${SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa \
+#	&& git config --global url."git@bitbucket.org:".insteadOf https://bitbucket.org/ \
+#	&& git config --global url."git@github.com:".insteadOf https://github.com/ \
+#	&& ssh-keyscan bitbucket.org >> ~/.ssh/known_hosts \
+#	&& ssh-keyscan github.com >> ~/.ssh/known_hosts
 
 # Set our workdir to our current service in the gopath
 WORKDIR /go/src/github.com/binhgo/GoMicro-Consignment

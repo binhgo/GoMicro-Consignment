@@ -7,9 +7,7 @@ func CreateSession(host string) (*mgo.Session, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	session.SetMode(mgo.Monotonic, true)
-
 	return session, nil
 }
 
